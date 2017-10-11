@@ -102,3 +102,6 @@ ENV/
 /.pydevproject
 /.project
 /.DS_Store
+*/.DS_Store
+*/db/
+*.csv

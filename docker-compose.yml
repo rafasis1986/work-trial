@@ -1,0 +1,18 @@
+version: '3.2'
+
+services:
+    db:
+        build:
+            context: .
+            dockerfile: ./compose/mysql/Dockerfile
+        env_file: 
+            - docker.env
+        volumes:
+            - ./data/db:/var/lib/mysql
+            - ./data/initial:/data
+        ports:
+            - "3307:3306"
+    adminer:
+        image: adminer:4.3.1
+        ports:
+            - "8081:8080"
