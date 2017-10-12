@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS test;
+
 USE test;
 
 DROP TABLE IF EXISTS `samples`;
@@ -117,3 +119,65 @@ CREATE   TABLE   `results_diversity`   (
     KEY   `value`   (`value`),
     KEY   `created`   (`created`)
 )   ENGINE=InnoDB   DEFAULT   CHARSET=latin1;
+
+CREATE VIEW samples_id_view AS
+    SELECT 
+        s.id AS SAMPLE_ID,
+        lsl.id AS SSR_ID,
+        lsl.PRID AS PRID,
+        lpt.seqRunId AS SEQRUN_ID
+    FROM
+        lab_pipeline_tracking as lpt
+        INNER JOIN lab_sample_loading as lsl ON lsl.PRID = lpt.PRID
+        INNER JOIN samples as s ON s.vial_barcode = lsl.tubeId
+    WHERE
+        lpt.seqRunId = 0;
+
+SET SESSION sql_mode='ALLOW_INVALID_DATES';
+
+USE test;
+
+TRUNCATE samples;
+
+LOAD DATA INFILE '/data/samples.csv' 
+INTO TABLE samples
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+TRUNCATE Lab_Sample_Loading;
+
+LOAD DATA INFILE '/data/Lab_Sample_Loading.csv' 
+INTO TABLE Lab_Sample_Loading
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+TRUNCATE Lab_Pipeline_Tracking;
+
+LOAD DATA INFILE '/data/Lab_Pipeline_Tracking.csv' 
+INTO TABLE Lab_Pipeline_Tracking
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+TRUNCATE clinical_result_counts;
+
+LOAD DATA INFILE '/data/clinical_result_counts.csv' 
+INTO TABLE clinical_result_counts
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+TRUNCATE results_diversity;
+
+LOAD DATA INFILE '/data/results_diversity.csv' 
+INTO TABLE results_diversity
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
