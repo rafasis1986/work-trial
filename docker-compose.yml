@@ -2,9 +2,7 @@ version: '3.2'
 
 services:
     db:
-        build:
-            context: .
-            dockerfile: ./compose/mysql/Dockerfile
+        image: rafasis1986/mysql-worktrial
         environment:
             - MYSQL_ROOT_PASSWORD=root
             - MYSQL_DATABASE=test
