@@ -167,8 +167,9 @@ CREATE VIEW samples_view AS
         lab_pipeline_tracking as lpt
         INNER JOIN lab_sample_loading as lsl ON lsl.PRID = lpt.PRID
         INNER JOIN samples as s ON s.vial_barcode = lsl.tubeId
+        LEFT JOIN exclude_samples as exs ON exs.id = s.id
     WHERE
-        lpt.seqRunId = 0
+        lpt.seqRunId = 0 AND ISNULL(exs.id)
     ORDER BY 
         sample,
         prid DESC;
