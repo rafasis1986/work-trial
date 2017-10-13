@@ -5,8 +5,7 @@ Created on Oct 13, 2017
 @author: rtorres
 '''
 import logging
-
-from .singleton import *
+import singleton
 
 
 @singleton
