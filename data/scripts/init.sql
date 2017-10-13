@@ -120,18 +120,58 @@ CREATE   TABLE   `results_diversity`   (
     KEY   `created`   (`created`)
 )   ENGINE=InnoDB   DEFAULT   CHARSET=latin1;
 
-CREATE VIEW samples_id_view AS
+CREATE TABLE `pending_ssr` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sample` bigint(20) NOT NULL,
+  `tubeid` varchar(32) NOT NULL,
+  `prid` varchar(255) NOT NULL,
+  `days_elapsed` varchar(45) DEFAULT NULL,
+  `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `ssr` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create index pending_prid_index on pending_ssr(prid) using HASH;
+create index pending_ssr_index on pending_ssr(ssr) using HASH;
+
+CREATE TABLE `aborted_ssr` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sample` bigint(20) NOT NULL,
+  `tubeid` varchar(32) NOT NULL,
+  `prid` varchar(255) NOT NULL,
+  `days_elapsed` varchar(45) DEFAULT NULL,
+  `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `ssr` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create index aborted_prid_index on aborted_ssr(prid) using HASH;
+create index aborted_ssr_index on aborted_ssr(ssr) using HASH;
+
+CREATE TABLE `exclude_samples` (
+  `id` bigint(20) NOT NULL,
+  `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE VIEW samples_view AS
     SELECT 
-        s.id AS SAMPLE_ID,
-        lsl.id AS SSR_ID,
-        lsl.PRID AS PRID,
-        lpt.seqRunId AS SEQRUN_ID
+        s.id AS sample,
+        lsl.id AS ssr,
+        lsl.PRID AS prid,
+        lpt.seqRunId AS seqrun
     FROM
         lab_pipeline_tracking as lpt
         INNER JOIN lab_sample_loading as lsl ON lsl.PRID = lpt.PRID
         INNER JOIN samples as s ON s.vial_barcode = lsl.tubeId
     WHERE
-        lpt.seqRunId = 0;
+        lpt.seqRunId = 0
+    ORDER BY 
+        sample,
+        prid DESC;
 
 SET SESSION sql_mode='ALLOW_INVALID_DATES';
 
