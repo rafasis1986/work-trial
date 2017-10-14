@@ -42,6 +42,20 @@ if __name__ == '__main__':
             else:
                 q.insert_filtered_ssr('aborted', aborted_candidates)
                 q.insert_filtered_ssr('pending', pending_candidates)
+        ssr_list = q.get_ssr_with_results()
+        q.update_aborted_ssr_results(ssr_list)
+        prid_totals = q.get_prid_abort_ssr_totals()
+        abort_prids = list()
+        for p in prid_totals:
+            aborted = float(p['abort_ssr'])
+            total = float(p['total_ssr'])
+            per_abort = (aborted / total) * 100
+            if per_abort == 100:
+                abort_prids.append(p)
+            print 'prid: {0}, abort: {1}%'.format(
+                p['prid'],
+                '{:3.2f}'.format(per_abort))
+        print 'prid list to abort', abort_prids
     except Exception as e:
         log.critical('Error {0}: {1}'.format(type(e), e.message))
     finally:

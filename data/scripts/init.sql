@@ -1,5 +1,7 @@
 CREATE DATABASE IF NOT EXISTS test;
 
+SET SESSION sql_mode='ALLOW_INVALID_DATES';
+
 USE test;
 
 DROP TABLE IF EXISTS `samples`;
@@ -166,8 +168,8 @@ CREATE VIEW samples_view AS
         lsl.PRID AS prid,
         lpt.seqRunId AS seqrun
     FROM
-        lab_pipeline_tracking as lpt
-        INNER JOIN lab_sample_loading as lsl ON lsl.PRID = lpt.PRID
+        Lab_Pipeline_Tracking as lpt
+        INNER JOIN Lab_Sample_Loading as lsl ON lsl.PRID = lpt.PRID
         INNER JOIN samples as s ON s.vial_barcode = lsl.tubeId
         LEFT JOIN exclude_samples as exs ON exs.id = s.id
     WHERE
@@ -181,16 +183,25 @@ CREATE VIEW aborted_in_results_view AS
         rd.ssr AS ssr
     FROM
         aborted_ssr as aborted
-        INNER JOIN results_diversity as rd ON rd.ssr = aborted.ssr
+        INNER JOIN results_diversity as rd ON rd.ssr = aborted.ssr;
 
 CREATE VIEW aborted_in_clinical_view AS
     SELECT 
         crc.ssr AS ssr
     FROM
         aborted_ssr as aborted
-        INNER JOIN clinical_result_counts as crc ON crc.ssr = aborted.ssr
+        INNER JOIN clinical_result_counts as crc ON crc.ssr = aborted.ssr;
 
-SET SESSION sql_mode='ALLOW_INVALID_DATES';
+CREATE VIEW prid_abort_ssr_totals_view AS
+    SELECT aborted.prid as prid, count(aborted.prid) as abort_ssr, lsl.count_lsl  as total_ssr                                                   
+     FROM aborted_ssr as aborted
+     INNER JOIN (
+         SELECT lsl.PRID as lsl_prid, count(lsl.PRID) as count_lsl
+         FROM Lab_Sample_Loading as lsl
+         GROUP BY lsl.PRID
+     ) as lsl ON lsl.lsl_prid = aborted.prid
+     where aborted.result = 0
+     group by aborted.prid ;
 
 USE test;
 
