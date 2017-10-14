@@ -5,7 +5,7 @@ Created on Oct 13, 2017
 @author: rtorres
 '''
 import logging
-import singleton
+from snippets.singleton import singleton
 
 
 @singleton

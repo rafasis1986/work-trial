@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 12-10-2017
 
@@ -33,7 +34,7 @@ def get_ssr_list_from_sample_id(sample_id):
     try:
         dao.create_connection()
         cur = dao.conection.cursor(DictCursor)
-        fields = 's.id as sample, lsl.tubeId as tubeid, lsl.id as ssr, lsl.prid, lpt.seqRunId'
+        fields = 's.id as sample, lsl.tubeid as tubeid, lsl.id as ssr, lsl.prid, lpt.seqRunId'
         tables = 'samples as s'
         conditions = 's.id={0}'.format(sample_id)
         criteria_order = 'lsl.id desc'
@@ -63,9 +64,9 @@ def insert_filtered_ssr(status, ssr_list):
             query_values = ''
             for row in ssr_list:
                 days = get_days_elapsed(row['prid'])
-                value = ('({0},{1},{2},{3},{4}),'.format(
+                value = ('({0},"{1}","{2}",{3},{4}),'.format(
                     row['sample'],
-                    row['tubeid'],
+                    str(row['tubeid']),
                     row['prid'],
                     days,
                     row['ssr'],
@@ -80,11 +81,12 @@ def insert_filtered_ssr(status, ssr_list):
             dao.create_connection()
             cur = dao.conection.cursor(DictCursor)
             cur.execute(query_str)
+            dao.commit()
         except DBError as e:
             log.warning('Error %d: %s' % (e.args[0], e.args[1]))
+            dao.roll_bakc()
         except Exception as e:
             log.critical('Error %d: %s' % (e.args[0], e.args[1]))
-        finally:
             dao.close_connection()
 
 
@@ -99,7 +101,9 @@ def insert_exclude_sample(sample):
         dao.create_connection()
         cur = dao.conection.cursor(DictCursor)
         cur.execute(query_str)
+        dao.commit()
     except DBError as e:
         log.warning('Error %d: %s' % (e.args[0], e.args[1]))
+        dao.roll_bakc()
     finally:
         dao.close_connection()

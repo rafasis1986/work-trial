@@ -64,7 +64,7 @@ CREATE   TABLE   `Lab_Sample_Loading`   (
     KEY   `latestRev2`   (`latestRev2`),
     KEY   `pipeline_rev`   (`pipeline_rev`),
     KEY   `PRID`   (`PRID`)
-)   ENGINE=InnoDB   DEFAULT   CHARSET=latin1;
+)   ENGINE=InnoDB   DEFAULT   CHARSET=utf8;
 
 
 CREATE   TABLE   `Lab_Pipeline_Tracking`   (
@@ -90,7 +90,7 @@ CREATE   TABLE   `Lab_Pipeline_Tracking`   (
     `active_at_robot`   int(11)   DEFAULT   NULL,
     PRIMARY   KEY   (`id`),
       KEY   `PRID`   (`PRID`)
-)   ENGINE=InnoDB   DEFAULT   CHARSET=latin1;
+)   ENGINE=InnoDB   DEFAULT   CHARSET=utf8;
 
 CREATE   TABLE   `clinical_result_counts`   (
     `id`   int(11)   NOT   NULL   AUTO_INCREMENT, 
@@ -105,7 +105,7 @@ CREATE   TABLE   `clinical_result_counts`   (
     KEY   `function`   (`taxon`),
     KEY   `ssr`   (`ssr`),
     KEY   `percent_count`   (`percent_count`)
-)   ENGINE=InnoDB   DEFAULT   CHARSET=latin1;
+)   ENGINE=InnoDB   DEFAULT   CHARSET=utf8;
 
 CREATE   TABLE   `results_diversity`   (
     `id`   bigint(20)   NOT   NULL   AUTO_INCREMENT,            
@@ -118,17 +118,18 @@ CREATE   TABLE   `results_diversity`   (
     KEY   `type`   (`type`),
     KEY   `value`   (`value`),
     KEY   `created`   (`created`)
-)   ENGINE=InnoDB   DEFAULT   CHARSET=latin1;
+)   ENGINE=InnoDB   DEFAULT   CHARSET=utf8;
 
 CREATE TABLE `pending_ssr` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sample` bigint(20) NOT NULL,
   `tubeid` varchar(32) NOT NULL,
   `prid` varchar(255) NOT NULL,
-  `days_elapsed` varchar(45) DEFAULT NULL,
+  `days_elapsed` int(11) DEFAULT NULL,
   `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `ssr` bigint(20) NOT NULL,
+  `result` BIT(1) DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -140,10 +141,11 @@ CREATE TABLE `aborted_ssr` (
   `sample` bigint(20) NOT NULL,
   `tubeid` varchar(32) NOT NULL,
   `prid` varchar(255) NOT NULL,
-  `days_elapsed` varchar(45) DEFAULT NULL,
+  `days_elapsed` int(11) DEFAULT NULL,
   `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `ssr` bigint(20) NOT NULL,
+  `result` BIT(1) DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -173,6 +175,20 @@ CREATE VIEW samples_view AS
     ORDER BY 
         sample,
         prid DESC;
+
+CREATE VIEW aborted_in_results_view AS
+    SELECT 
+        rd.ssr AS ssr
+    FROM
+        aborted_ssr as aborted
+        INNER JOIN results_diversity as rd ON rd.ssr = aborted.ssr
+
+CREATE VIEW aborted_in_clinical_view AS
+    SELECT 
+        crc.ssr AS ssr
+    FROM
+        aborted_ssr as aborted
+        INNER JOIN clinical_result_counts as crc ON crc.ssr = aborted.ssr
 
 SET SESSION sql_mode='ALLOW_INVALID_DATES';
 

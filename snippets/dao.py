@@ -30,3 +30,11 @@ class DAO():
     def close_connection(self):
         if self.conection:
             self.conection.close()
+
+    def commit(self):
+        if self.conection:
+            self.conection.commit()
+
+    def roll_bakc(self):
+        if self.conection:
+            self.conection.rollback()
