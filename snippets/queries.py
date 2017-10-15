@@ -14,6 +14,21 @@ from .parsers import get_days_elapsed
 from .logger import Logger as log
 
 
+def init_worktrial_scripts():
+    try:
+        for s in ['aborted', 'pending']:
+            query_str = 'TRUNCATE {0}_ssr ;'.format(s)
+            dao.create_connection()
+            cur = dao.conection.cursor()
+            cur.execute(query_str)
+            dao.commit()
+    except DBError as e:
+        log.critical('Error %d: %s' % (e.args[0], e.args[1]))
+        sys.exit(1)
+    finally:
+        dao.close_connection()
+
+
 def get_sample_ids():
     try:
         dao.create_connection()
