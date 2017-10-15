@@ -54,7 +54,7 @@ class BaseController(CementBaseController):
                         days_filter=days_filter,
                         limit=limit_days)
                     headers = [
-                        'PRID', 'Total SSR', 'Aborted SSR', 'Percentage', 'Days Elapsed', 'Erasable']
+                        'PRID', 'Aborted SSR', 'Total SSR', 'Percentage', 'Days Elapsed', 'Erasable']
                     self.app.render(prids, headers=headers)
                 print('')
         except Exception as e:
