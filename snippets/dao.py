@@ -8,7 +8,10 @@ import os
 
 import MySQLdb
 
+from snippets.singleton import singleton
 
+
+@singleton
 class DAO():
     host = None
     user = None

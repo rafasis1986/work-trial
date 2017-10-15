@@ -9,13 +9,12 @@ import sys
 from MySQLdb.cursors import DictCursor
 from MySQLdb import Error as DBError
 
-from .dao import DAO
+from .dao import DAO as dao
 from .parsers import get_days_elapsed
 from .logger import Logger as log
 
 
 def get_sample_ids():
-    dao = DAO()
     try:
         dao.create_connection()
         cur = dao.conection.cursor(DictCursor)
@@ -30,7 +29,6 @@ def get_sample_ids():
 
 
 def get_ssr_list_from_sample_id(sample_id):
-    dao = DAO()
     try:
         dao.create_connection()
         cur = dao.conection.cursor(DictCursor)
@@ -58,7 +56,6 @@ def get_ssr_list_from_sample_id(sample_id):
 
 
 def get_ssr_with_results():
-    dao = DAO()
     try:
         dao.create_connection()
         samples = list()
@@ -77,7 +74,6 @@ def get_ssr_with_results():
 
 
 def get_prid_abort_ssr_totals():
-    dao = DAO()
     try:
         dao.create_connection()
         samples = list()
@@ -95,7 +91,6 @@ def get_prid_abort_ssr_totals():
 
 def insert_filtered_ssr(status, ssr_list):
     if len(ssr_list) > 0:
-        dao = DAO()
         try:
             query_values = ''
             for row in ssr_list:
@@ -127,7 +122,6 @@ def insert_filtered_ssr(status, ssr_list):
 
 
 def insert_exclude_sample(sample):
-    dao = DAO()
     try:
         values_str = 'id'
         query_str = 'INSERT INTO exclude_samples ({0}) VALUES ({1});'.format(
@@ -146,7 +140,6 @@ def insert_exclude_sample(sample):
 
 
 def update_aborted_ssr_results(ssr_list=[]):
-    dao = DAO()
     try:
         dao.create_connection()
         fields = 'result = 0'
