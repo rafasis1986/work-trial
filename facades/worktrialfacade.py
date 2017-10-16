@@ -96,3 +96,21 @@ def filter_prid_abortables(only_erasables=False, days_filter=False, limit=180):
         log.critical('Error {0}: {1}'.format(type(e), e.message))
     finally:
         log.debug('end filter_prid_abortables')
+
+
+def make_report_output(file_name, prids):
+    try:
+        log.debug('start make_report_output')
+        report = open(file_name, 'w')
+        report.write('PRID: {0} \n'.format(','.join(prids)))
+        if prids and len(prids) > 0:
+            ssr_ids = q.get_ssr_abort_list_from_prids(prids)
+            if ssr_ids:
+                ssr_ids = ['%s' % str(ssr['id']) for ssr in ssr_ids]
+                report.write('SSR: {0} \n'.format(','.join(ssr_ids)))
+        report.close()
+        print 'Generated report in {0}'.format(file_name)
+    except Exception as e:
+        log.critical('Error {0}: {1}'.format(type(e), e.message))
+    finally:
+        log.debug('end make_report_output')

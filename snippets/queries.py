@@ -100,6 +100,25 @@ def get_prid_abort_ssr_totals():
         dao.close_connection()
 
 
+def get_ssr_abort_list_from_prids(prids):
+    try:
+        dao.create_connection()
+        condition = ''
+        for p in prids:
+            condition += '"{0}",'.format(p)
+        if len(condition) > 0:
+            condition = condition[:-1]
+        query_str = 'SELECT id FROM Lab_Sample_Loading WHERE prid in ({0}) order by id;'.format(condition)
+        cur = dao.conection.cursor(DictCursor)
+        cur.execute(query_str)
+        return cur.fetchall()
+    except DBError as e:
+        log.warning('Error %d: %s' % (e.args[0], e.args[1]))
+        dao.roll_bakc()
+    finally:
+        dao.close_connection()
+
+
 def get_rows_table(table_name=''):
     try:
         dao.create_connection()

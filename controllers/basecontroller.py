@@ -4,16 +4,18 @@ Created on Oct 15, 2017
 
 @author: rtorres
 '''
-from utils import constants as c
+import os
+
 from cement.core.controller import CementBaseController
 from cement.core.controller import expose
 from cement.utils import shell
 from facades import worktrialfacade as f
 from snippets.decisionprompt import DecisionPrompt
-import os
+from utils import constants as c
 
 
 class BaseController(CementBaseController):
+    prids_id = []
 
     class Meta:
         label = 'base'
@@ -29,6 +31,7 @@ class BaseController(CementBaseController):
                         c.MENU_FILTER_SSR,
                         c.MENU_FILTER_PRID,
                         c.MENU_GET_REPORT_PRID,
+                        c.MENU_GET_ROWS_ID_TO_DELETE,
                         c.MENU_CLOSE],
                     numbered=True,)
                 if option.input == c.MENU_CLOSE:
@@ -38,7 +41,14 @@ class BaseController(CementBaseController):
                     f.find_aborted_and_pending_ssr()
                 elif option.input == c.MENU_FILTER_PRID:
                     f.check_aborted_ssr()
+                elif option.input == c.MENU_GET_ROWS_ID_TO_DELETE:
+                    print 'Please insert the filename to get all id rows selected.'
+                    file_name = ''
+                    while len(file_name) == 0:
+                        file_name = raw_input('file name: ')
+                    f.make_report_output(file_name, self.prids_id)
                 elif option.input == c.MENU_GET_REPORT_PRID:
+                    self.prids_id = []
                     decision = DecisionPrompt('Do you want get only erasable prids?')
                     erasable = False
                     if decision.input.lower() == 'yes':
@@ -56,6 +66,9 @@ class BaseController(CementBaseController):
                     headers = [
                         'PRID', 'Aborted SSR', 'Total SSR', 'Percentage', 'Days Elapsed', 'Erasable']
                     self.app.render(prids, headers=headers)
+                    for p in prids:
+                        if p[-1]:
+                            self.prids_id.append(p[0])
                 print('')
         except Exception as e:
             print type(e), e
