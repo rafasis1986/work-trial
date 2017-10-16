@@ -1,0 +1,14 @@
+version: '3.2'
+
+services:
+    db_test:
+        image: rafasis1986/mysql-worktrial
+        environment:
+            - MYSQL_DATABASE=test
+            - MYSQL_ROOT_PASSWORD=root
+        volumes:
+            - ./data/db_test:/var/lib/mysql
+            - ./data/test:/data
+            - ./data/test:/docker-entrypoint-initdb.d/:ro
+        ports:
+            - "3308:3306"

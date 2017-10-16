@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS worktrial;
+CREATE DATABASE IF NOT EXISTS test;
 
 SET SESSION sql_mode='ALLOW_INVALID_DATES';
 
-USE worktrial;
+USE test;
 
 DROP TABLE IF EXISTS `samples`;
 DROP TABLE IF EXISTS `Lab_Sample_Loading`;
@@ -203,7 +203,7 @@ CREATE VIEW prid_abort_ssr_totals_view AS
      where aborted.result = 0
      group by aborted.prid ;
 
-USE worktrial;
+USE test;
 
 TRUNCATE samples;
 

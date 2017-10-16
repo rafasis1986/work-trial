@@ -104,4 +104,6 @@ ENV/
 /.DS_Store
 */.DS_Store
 */db/
-*.csv
+*/db_test/
+*/initial/*.csv
+/app/
