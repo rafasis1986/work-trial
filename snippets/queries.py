@@ -33,7 +33,7 @@ def get_sample_ids():
     try:
         dao.create_connection()
         cur = dao.conection.cursor(DictCursor)
-        query_str = 'SELECT distinct(sample) FROM test.samples_view ORDER BY sample;'
+        query_str = 'SELECT distinct(sample) FROM samples_view ORDER BY sample;'
         cur.execute(query_str)
         return cur.fetchall()
     except DBError as e:
@@ -47,7 +47,7 @@ def get_ssr_list_from_sample_id(sample_id):
     try:
         dao.create_connection()
         cur = dao.conection.cursor(DictCursor)
-        fields = 's.id as sample, lsl.tubeid as tubeid, lsl.id as ssr, lsl.prid, lpt.seqRunId'
+        fields = 's.id as sample, lsl.tubeid as tubeid, lsl.id as ssr, lsl.prid, lpt.seqRunId, lpt.id as prid_id'
         tables = 'samples as s'
         conditions = 's.id={0}'.format(sample_id)
         criteria_order = 'lsl.id desc'
@@ -110,15 +110,16 @@ def insert_filtered_ssr(status, ssr_list):
             query_values = ''
             for row in ssr_list:
                 days = get_days_elapsed(row['prid'])
-                value = ('({0},"{1}","{2}",{3},{4}),'.format(
+                value = ('({0},"{1}","{2}",{3},{4}, {5}),'.format(
                     row['sample'],
                     str(row['tubeid']),
                     row['prid'],
                     days,
                     row['ssr'],
+                    row['prid_id'],
                 ))
                 query_values += value
-            values_str = 'sample, tubeid, prid, days_elapsed, ssr'
+            values_str = 'sample, tubeid, prid, days_elapsed, ssr, prid_id'
             query_str = 'INSERT INTO {0}_ssr ({1}) VALUES {2};'.format(
                 status,
                 values_str,

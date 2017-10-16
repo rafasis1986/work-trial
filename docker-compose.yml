@@ -8,7 +8,7 @@ services:
             - MYSQL_DATABASE=test
         volumes:
             - ./data/db:/var/lib/mysql
-            - ./data/test:/data
+            - ./data/initial:/data
             - ./data/scripts:/docker-entrypoint-initdb.d/:ro
         ports:
             - "3307:3306"

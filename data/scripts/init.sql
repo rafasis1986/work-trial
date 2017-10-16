@@ -124,14 +124,15 @@ CREATE   TABLE   `results_diversity`   (
 
 CREATE TABLE `pending_ssr` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sample` bigint(20) NOT NULL,
   `tubeid` varchar(32) NOT NULL,
   `prid` varchar(255) NOT NULL,
+  `prid_id` bigint(20) NOT NULL,
   `days_elapsed` int(11) DEFAULT NULL,
   `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `ssr` bigint(20) NOT NULL,
   `result` BIT(1) DEFAULT 1,
-  `prid_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -140,14 +141,15 @@ create index pending_ssr_index on pending_ssr(ssr) using HASH;
 
 CREATE TABLE `aborted_ssr` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sample` bigint(20) NOT NULL,
   `tubeid` varchar(32) NOT NULL,
   `prid` varchar(255) NOT NULL,
+  `prid_id` bigint(20) NOT NULL,
   `days_elapsed` int(11) DEFAULT NULL,
   `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `ssr` bigint(20) NOT NULL,
   `result` BIT(1) DEFAULT 1,
-  `prid_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -163,14 +165,14 @@ CREATE TABLE `exclude_samples` (
 
 CREATE VIEW samples_view AS
     SELECT 
-        s.vial_barcode as tubeid,
+        s.id AS sample,
         lsl.id AS ssr,
         lsl.PRID AS prid,
         lpt.seqRunId AS seqrun
     FROM
         Lab_Pipeline_Tracking as lpt
-        INNER JOIN Lab_Sample_Loading as lsl ON lsl.PRID = lpt.PRID AND lsl.PRID != ''
-        INNER JOIN samples as s ON s.vial_barcode = lsl.tubeId AND lsl.tubeId != ''
+        INNER JOIN Lab_Sample_Loading as lsl ON lsl.PRID = lpt.PRID
+        INNER JOIN samples as s ON s.vial_barcode = lsl.tubeId
         LEFT JOIN exclude_samples as exs ON exs.id = s.id
     WHERE
         lpt.seqRunId = 0 AND ISNULL(exs.id)
@@ -193,17 +195,19 @@ CREATE VIEW aborted_in_clinical_view AS
         INNER JOIN clinical_result_counts as crc ON crc.ssr = aborted.ssr;
 
 CREATE VIEW prid_abort_ssr_totals_view AS
-    SELECT aborted.prid as prid, count(aborted.prid) as abort_ssr, lsl.count_lsl  as total_ssr                                                   
+    SELECT
+        aborted.prid_id as prid_id, 
+        aborted.prid as prid,
+        count( distinct( aborted.ssr )) as abort_ssr,
+        lsl.count_lsl  as total_ssr                                                   
      FROM aborted_ssr as aborted
      INNER JOIN (
-         SELECT lsl.PRID as lsl_prid, count(lsl.PRID) as count_lsl
+         SELECT lsl.PRID as lsl_prid, count(lsl.id) as count_lsl
          FROM Lab_Sample_Loading as lsl
          GROUP BY lsl.PRID
      ) as lsl ON lsl.lsl_prid = aborted.prid
      where aborted.result = 0
      group by aborted.prid ;
-
-USE worktrial;
 
 TRUNCATE samples;
 

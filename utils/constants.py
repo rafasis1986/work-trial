@@ -9,5 +9,6 @@ APP_NAME = 'work-trial'
 
 MENU_CLOSE = 'Close'
 MENU_GET_REPORT_PRID = 'Report with PRID list to remove'
-MENU_FILTER_PRID = 'Evaluate all abortable SSR'
-MENU_FILTER_SSR = 'Get SSR in abortable condition'
+MENU_FILTER_PRID = 'Check the abortable SSR that exist in clinical and result tables'
+MENU_FILTER_SSR = 'Get PRID report with abortable SSR percentage.'
+
