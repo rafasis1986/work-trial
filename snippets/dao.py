@@ -23,7 +23,7 @@ class DAO():
     def __init__(self):
         self.host = os.getenv('DB_HOST', 'localhost')
         self.user = os.getenv('DB_USER', 'root')
-        self.password = os.getenv('DB_PASSWORD')
+        self.password = os.getenv('DB_PASSWORD', '')
         self.db_name = os.getenv('DB_NAME')
         self.port = int(os.getenv('DB_PORT', '3306'))
 
@@ -31,7 +31,7 @@ class DAO():
         self.conection = MySQLdb.connect(self.host, self.user, self.password, self.db_name, self.port)
 
     def close_connection(self):
-        if self.conection:
+        if self.conection and self.conection.open == 1:
             self.conection.close()
 
     def commit(self):

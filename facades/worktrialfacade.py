@@ -16,19 +16,19 @@ def find_aborted_and_pending_ssr():
         log.debug('start get_aborted_and_pending_ssr')
         start_time = time.time()
         q.init_worktrial_scripts()
-        samples = q.get_sample_ids()
+        tubes = q.get_tube_ids()
         counter = 1
-        print 'I found {0} samples to analyze'.format(len(samples))
-        for s in samples:
-            print 'I am analizing the sample {0} from  {1}, current id {2}'.format(
+        print 'I found {0} tubes to analyze'.format(len(tubes))
+        for s in tubes:
+            print 'I am analizing the tube {0} from  {1}, current id {2}'.format(
                 counter,
-                len(samples),
-                s['sample'])
+                len(tubes),
+                s['tubeid'])
             counter += 1
             first_processed = False
             pending_candidates = list()
             aborted_candidates = list()
-            response = q.get_ssr_list_from_sample_id(s['sample'])
+            response = q.get_ssr_list_from_tube_id(s['tubeid'])
             for row in response:
                 if row['seqRunId'] != 0:
                     if not first_processed:
@@ -39,7 +39,7 @@ def find_aborted_and_pending_ssr():
                     else:
                         pending_candidates.append(row)
             if not first_processed:
-                q.insert_exclude_sample(s)
+                pass
             else:
                 q.insert_filtered_ssr('aborted', aborted_candidates)
                 q.insert_filtered_ssr('pending', pending_candidates)
