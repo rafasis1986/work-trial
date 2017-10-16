@@ -1,0 +1,9 @@
+PRID,StartTime,primerPlateId,PCRSetupStartTime,PCRPlateBarcode,ExtractStorageTime,ThermocycleStartTime,PCRProductTubeId,PCRProductScanTime,qBitData,DCCPlateStorageTime,labChippedTubeId,labChippedProductScanTime,PCRProductTubeStorageTime,FinalLibraryAliquatTime,labChippedTubeStorageTime,id,seqRunName,seqRunId,active_at_robot
+10-13-2016-996,1476377525,,,,,,,,,,,,,,,996,,1,NULL
+10-12-2016-995,1476299228,5,,,,,,,,,,,,,,995,,221,NULL
+10-11-2016-991,1476204678,,,,,,,,,,,,,,,991,,5,NULL
+10-10-2016-990,1476204678,,,,,,,,,,,,,,,990,,2,NULL
+10-13-2016-96,1476377525,,,,,,,,,,,,,,,96,,0,NULL
+10-12-2016-95,1476299228,5,,,,,,,,,,,,,,95,,0,NULL
+10-11-2016-91,1476204678,,,,,,,,,,,,,,,91,,0,NULL
+10-10-2016-90,1476204678,,,,,,,,,,,,,,,90,,0,NULL

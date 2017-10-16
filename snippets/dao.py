@@ -8,7 +8,10 @@ import os
 
 import MySQLdb
 
+from snippets.singleton import singleton
 
+
+@singleton
 class DAO():
     host = None
     user = None
@@ -30,3 +33,11 @@ class DAO():
     def close_connection(self):
         if self.conection:
             self.conection.close()
+
+    def commit(self):
+        if self.conection:
+            self.conection.commit()
+
+    def roll_bakc(self):
+        if self.conection:
+            self.conection.rollback()
