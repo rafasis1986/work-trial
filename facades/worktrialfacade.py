@@ -96,3 +96,28 @@ def filter_prid_abortables(only_erasables=False, days_filter=False, limit=180):
         log.critical('Error {0}: {1}'.format(type(e), e.message))
     finally:
         log.debug('end filter_prid_abortables')
+
+
+def make_report_output(file_name, absolutes_prids=[], partials_prids=[]):
+    try:
+        log.debug('start make_report_output')
+        report = open(file_name, 'w')
+        report.write('PRIDs to remove absolutely: {0} \n'.format(','.join(absolutes_prids)))
+        if len(absolutes_prids) > 0:
+            ssr_ids = q.get_ssr_abort_list_from_prids(absolutes_prids)
+            if ssr_ids:
+                ssr_ids = ['%s' % str(ssr['id']) for ssr in ssr_ids]
+                report.write('SSR: {0} \n'.format(','.join(ssr_ids)))
+        if len(partials_prids) > 0:
+            report.write('\n')
+            report.write('SSR list from partial PRIDs to remove \n')
+            ssr_ids = q.get_ssr_abort_list_from_prids(partials_prids)
+            if ssr_ids:
+                ssr_ids = ['%s' % str(ssr['id']) for ssr in ssr_ids]
+                report.write('SSR: {0} \n'.format(','.join(ssr_ids)))
+        report.close()
+        print 'Generated report in {0}'.format(file_name)
+    except Exception as e:
+        log.critical('Error {0}: {1}'.format(type(e), e.message))
+    finally:
+        log.debug('end make_report_output')

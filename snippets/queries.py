@@ -6,12 +6,12 @@ Created on 12-10-2017
 '''
 import sys
 
-from MySQLdb.cursors import DictCursor
 from MySQLdb import Error as DBError
+from MySQLdb.cursors import DictCursor
 
 from .dao import DAO as dao
-from .parsers import get_days_elapsed
 from .logger import Logger as log
+from .parsers import get_days_elapsed
 
 
 def init_worktrial_scripts():
@@ -73,14 +73,14 @@ def get_ssr_list_from_sample_id(sample_id):
 def get_ssr_with_results():
     try:
         dao.create_connection()
-        samples = list()
+        ssr_list = list()
         for q in ['clinical', 'results']:
             query_str = 'SELECT ssr FROM aborted_in_%s_view;' % q
             cur = dao.conection.cursor(DictCursor)
             cur.execute(query_str)
             aux_rows = cur.fetchall()
-            samples += [a['ssr'] for a in aux_rows]
-        return samples
+            ssr_list += [a['ssr'] for a in aux_rows]
+        return ssr_list
     except DBError as e:
         log.warning('Error %d: %s' % (e.args[0], e.args[1]))
         dao.roll_bakc()
@@ -97,6 +97,25 @@ def get_prid_abort_ssr_totals():
         cur.execute(query_str)
         return cur.fetchall()
         return samples
+    except DBError as e:
+        log.warning('Error %d: %s' % (e.args[0], e.args[1]))
+        dao.roll_bakc()
+    finally:
+        dao.close_connection()
+
+
+def get_ssr_abort_list_from_prids(prids):
+    try:
+        dao.create_connection()
+        condition = ''
+        for p in prids:
+            condition += '"{0}",'.format(p)
+        if len(condition) > 0:
+            condition = condition[:-1]
+        query_str = 'SELECT id FROM Lab_Sample_Loading WHERE prid in ({0}) order by id;'.format(condition)
+        cur = dao.conection.cursor(DictCursor)
+        cur.execute(query_str)
+        return cur.fetchall()
     except DBError as e:
         log.warning('Error %d: %s' % (e.args[0], e.args[1]))
         dao.roll_bakc()
