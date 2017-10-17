@@ -39,7 +39,7 @@ class BaseController(CementBaseController):
                     print 'good bye'
                     break
                 elif option.input == c.MENU_FILTER_SSR:
-                    f.find_aborted_and_pending_ssr()
+                    f.find_aborted_ssr()
                 elif option.input == c.MENU_FILTER_PRID:
                     f.check_aborted_ssr()
                 elif option.input == c.MENU_GET_ROWS_ID_TO_DELETE:

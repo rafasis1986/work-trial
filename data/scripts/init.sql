@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS `Lab_Sample_Loading`;
 DROP TABLE IF EXISTS `Lab_Pipeline_Tracking`;
 DROP TABLE IF EXISTS `clinical_result_counts`;
 DROP TABLE IF EXISTS `results_diversity`;
+DROP TABLE IF EXISTS `aborted_ssr`;
 
 CREATE   TABLE   `samples`   (
     `id`   bigint(20)   NOT   NULL   AUTO_INCREMENT,                                         
@@ -122,23 +123,6 @@ CREATE   TABLE   `results_diversity`   (
     KEY   `created`   (`created`)
 )   ENGINE=InnoDB   DEFAULT   CHARSET=utf8;
 
-CREATE TABLE `pending_ssr` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `sample` bigint(20) NOT NULL,
-  `tubeid` varchar(32) NOT NULL,
-  `prid` varchar(255) NOT NULL,
-  `prid_id` bigint(20) NOT NULL,
-  `days_elapsed` int(11) DEFAULT NULL,
-  `created_ts` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `ssr` bigint(20) NOT NULL,
-  `result` BIT(1) DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-create index pending_prid_index on pending_ssr(prid) using HASH;
-create index pending_ssr_index on pending_ssr(ssr) using HASH;
-
 CREATE TABLE `aborted_ssr` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sample` bigint(20) NOT NULL,
@@ -150,6 +134,7 @@ CREATE TABLE `aborted_ssr` (
   `updated_ts` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `ssr` bigint(20) NOT NULL,
   `result` BIT(1) DEFAULT 1,
+  `pending` BIT(1) DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -185,14 +170,18 @@ CREATE VIEW aborted_in_results_view AS
         rd.ssr AS ssr
     FROM
         aborted_ssr as aborted
-        INNER JOIN results_diversity as rd ON rd.ssr = aborted.ssr;
+        INNER JOIN results_diversity as rd ON rd.ssr = aborted.ssr
+    WHERE
+        aborted.pending = 0;
 
 CREATE VIEW aborted_in_clinical_view AS
     SELECT 
         crc.ssr AS ssr
     FROM
         aborted_ssr as aborted
-        INNER JOIN clinical_result_counts as crc ON crc.ssr = aborted.ssr;
+        INNER JOIN clinical_result_counts as crc ON crc.ssr = aborted.ssr
+    WHERE
+        aborted.pending = 0;
 
 CREATE VIEW prid_abort_ssr_totals_view AS
     SELECT
@@ -206,7 +195,7 @@ CREATE VIEW prid_abort_ssr_totals_view AS
          FROM Lab_Sample_Loading as lsl
          GROUP BY lsl.PRID
      ) as lsl ON lsl.lsl_prid = aborted.prid
-     where aborted.result = 0
+     where aborted.result = 0 AND aborted.pending = 0
      group by aborted.prid ;
 
 TRUNCATE samples;

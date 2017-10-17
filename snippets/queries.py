@@ -16,12 +16,11 @@ from .parsers import get_days_elapsed
 
 def init_worktrial_scripts():
     try:
-        for s in ['aborted', 'pending']:
-            query_str = 'TRUNCATE {0}_ssr ;'.format(s)
-            dao.create_connection()
-            cur = dao.conection.cursor()
-            cur.execute(query_str)
-            dao.commit()
+        query_str = 'TRUNCATE aborted_ssr ;'
+        dao.create_connection()
+        cur = dao.conection.cursor()
+        cur.execute(query_str)
+        dao.commit()
     except DBError as e:
         log.critical('Error %d: %s' % (e.args[0], e.args[1]))
         sys.exit(1)
@@ -102,10 +101,15 @@ def get_prid_abort_ssr_totals():
         dao.close_connection()
 
 
-def get_rows_by_table_name(table_name):
+def get_rows_by_table_name(table_name, condition=None):
     try:
         dao.create_connection()
-        query_str = 'SELECT * FROM {0};'.format(table_name)
+        if condition:
+            query_str = 'SELECT * FROM {0} WHERE {1};'.format(
+                table_name,
+                condition)
+        else:
+            query_str = 'SELECT * FROM {0};'.format(table_name)
         cur = dao.conection.cursor(DictCursor)
         cur.execute(query_str)
         return cur.fetchall()
@@ -135,24 +139,24 @@ def get_ssr_abort_list_from_prids(prids):
         dao.close_connection()
 
 
-def insert_filtered_ssr(status, ssr_list):
+def insert_filtered_ssr(pending, ssr_list):
     if len(ssr_list) > 0:
         try:
             query_values = ''
             for row in ssr_list:
                 days = get_days_elapsed(row['prid'])
-                value = ('({0},"{1}","{2}",{3},{4}, {5}),'.format(
+                value = ('({0},"{1}","{2}",{3},{4}, {5}, {6}),'.format(
                     row['sample'],
                     str(row['tubeid']),
                     row['prid'],
                     days,
                     row['ssr'],
                     row['prid_id'],
+                    pending,
                 ))
                 query_values += value
-            values_str = 'sample, tubeid, prid, days_elapsed, ssr, prid_id'
-            query_str = 'INSERT INTO {0}_ssr ({1}) VALUES {2};'.format(
-                status,
+            values_str = 'sample, tubeid, prid, days_elapsed, ssr, prid_id, pending'
+            query_str = 'INSERT INTO aborted_ssr ({0}) VALUES {1};'.format(
                 values_str,
                 query_values[:-1],
             )
@@ -194,7 +198,7 @@ def update_aborted_ssr_results(ssr_list=[]):
         if len(ssr_list) > 0:
             ssr_str = ','.join([str(item) for item in ssr_list])
         condition = 'ssr not in ({0})'.format(ssr_str)
-        query_str = 'UPDATE aborted_ssr SET {0}  WHERE {1};'.format(
+        query_str = 'UPDATE aborted_ssr SET {0}  WHERE pending = 0 AND {1};'.format(
             fields,
             condition)
         cur = dao.conection.cursor()

@@ -11,9 +11,9 @@ from snippets.logger import Logger as log
 from snippets.parsers import get_days_elapsed
 
 
-def find_aborted_and_pending_ssr():
+def find_aborted_ssr():
     try:
-        log.debug('start get_aborted_and_pending_ssr')
+        log.debug('start find_aborted_ssr')
         start_time = time.time()
         q.init_worktrial_scripts()
         samples = q.get_sample_ids()
@@ -41,14 +41,14 @@ def find_aborted_and_pending_ssr():
             if not first_processed:
                 q.insert_exclude_sample(s)
             else:
-                q.insert_filtered_ssr('aborted', aborted_candidates)
-                q.insert_filtered_ssr('pending', pending_candidates)
+                q.insert_filtered_ssr(0, aborted_candidates)
+                q.insert_filtered_ssr(1, pending_candidates)
     except Exception as e:
         log.critical('Error {0}: {1}'.format(type(e), e.message))
     finally:
         t_str = 'time elapsed {0} second !'.format(time.time() - start_time)
         log.debug(t_str)
-        log.debug('end get_aborted_and_pending_ssr')
+        log.debug('end find_aborted_ssr')
 
 
 def check_aborted_ssr():

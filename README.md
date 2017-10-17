@@ -1,5 +1,4 @@
-# Starter​ Project 
-#​@ Data Quality Team
+# Starter​ Project @ Data Quality Team
 
 ## RESUME
 
@@ -15,7 +14,7 @@ The project consists in one CLI application to get all ssr and PRID abortables.
 **Prerequisites**
 
 -   [Python 2.7.10+](https://www.python.org/downloads/release/python-2713)
--   [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)
+-   [virtualenvwrapper 4.7.+](https://virtualenvwrapper.readthedocs.io/en/latest/)
 -   [Docker 17.04.0+](https://docs.docker.com/engine/installation/)
 -   [Docker-Compose 1.14.0+](https://docs.docker.com/compose/install/)
 
@@ -56,6 +55,14 @@ and finally to stop all the compose container use:
 ```sh
 $ docker-compose stop
 ```
+
+**Important**
+
+ If you want remove all database to re run the init script you need stop your database container and remove all from the database folder ```data/db``` with this comamd.
+ 
+ ```
+ $ sudo rm -r data/db 
+ ```
 
 Finally to deploy the application we need previously install the python virtual enviroment I recomend use the *virtualenvwrapper* because you only need set some rules in your .bash_profile or .bashrc, to create and install all dependencies you use the next two sentences:
 
@@ -113,3 +120,5 @@ Ran 7 tests in 0.164s
 OK
 
 ```
+
+Like the production enviroment the data for the test database container are in the default folder  ```dat/db_test```.
