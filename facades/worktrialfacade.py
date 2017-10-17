@@ -109,14 +109,14 @@ def make_report_output(file_name, absolutes_prids=[], partials_prids=[]):
                 ssr_ids = ['%s' % str(ssr['id']) for ssr in ssr_ids]
                 report.write('SSR: {0} \n'.format(','.join(ssr_ids)))
         if len(partials_prids) > 0:
-            report.write('\n')
-            report.write('SSR list from partial PRIDs to remove \n')
+            report.write('\n\n')
+            report.write('SSR list from PRIDs with Aborted SSR lowest that 100%: \n\n')
             ssr_ids = q.get_ssr_abort_list_from_prids(partials_prids)
             if ssr_ids:
                 ssr_ids = ['%s' % str(ssr['id']) for ssr in ssr_ids]
                 report.write('SSR: {0} \n'.format(','.join(ssr_ids)))
         report.close()
-        print 'Generated report in {0}'.format(file_name)
+        print '\nGenerated report in {0}!!\n'.format(file_name)
     except Exception as e:
         log.critical('Error {0}: {1}'.format(type(e), e.message))
     finally:

@@ -5,7 +5,7 @@ services:
         image: rafasis1986/mysql-worktrial
         environment:
             - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=test
+            - MYSQL_DATABASE=worktrial
         volumes:
             - ./data/db:/var/lib/mysql
             - ./data/initial:/data
