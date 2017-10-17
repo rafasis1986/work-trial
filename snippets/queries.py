@@ -91,12 +91,24 @@ def get_ssr_with_results():
 def get_prid_abort_ssr_totals():
     try:
         dao.create_connection()
-        samples = list()
         query_str = 'SELECT * FROM prid_abort_ssr_totals_view;'
         cur = dao.conection.cursor(DictCursor)
         cur.execute(query_str)
         return cur.fetchall()
-        return samples
+    except DBError as e:
+        log.warning('Error %d: %s' % (e.args[0], e.args[1]))
+        dao.roll_bakc()
+    finally:
+        dao.close_connection()
+
+
+def get_rows_by_table_name(table_name):
+    try:
+        dao.create_connection()
+        query_str = 'SELECT * FROM {0};'.format(table_name)
+        cur = dao.conection.cursor(DictCursor)
+        cur.execute(query_str)
+        return cur.fetchall()
     except DBError as e:
         log.warning('Error %d: %s' % (e.args[0], e.args[1]))
         dao.roll_bakc()
